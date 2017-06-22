@@ -18,25 +18,12 @@ class KidsCalmSpeechletTest {
     @Test
     fun testOnLaunchHappyPath() {
         val actual = fixture.onLaunch(null)
-        val actualOutputSpeech = actual.outputSpeech
-        val actualRepromptSpeech = actual.reprompt
+        val actualOutputSpeech = actual.outputSpeech as PlainTextOutputSpeech
+        val actualRepromptSpeech = actual.reprompt.outputSpeech as PlainTextOutputSpeech
 
-        if(actualOutputSpeech is PlainTextOutputSpeech){
-            assertThat(actualOutputSpeech.text, `is`("Welcome to Kids Calm."))
-        }else{
-            fail("expected type of PlainTextOutputSpeech but got ${actualOutputSpeech.javaClass.canonicalName}")
-        }
-
-        if(actualRepromptSpeech is Reprompt){
-            val actualRepromptOutputSpeech = actualRepromptSpeech.outputSpeech
-            if(actualRepromptOutputSpeech is PlainTextOutputSpeech) {
-                assertThat(actualRepromptOutputSpeech.text, `is`("Welcome to Kids Calm."))
-            }else{
-                fail("expected type of PlainTextOutputSpeech but got ${actualOutputSpeech.javaClass.canonicalName}")
-            }
-        }else {
-            fail("expected type of Reprompt but got ${actualRepromptSpeech.javaClass.canonicalName}")
-        }
+        assertThat(actual.shouldEndSession, `is`(false))
+        assertThat(actualOutputSpeech.text, `is`("Welcome to Kids Calm."))
+        assertThat(actualRepromptSpeech.text, `is`("Welcome to Kids Calm."))
     }
 
 
