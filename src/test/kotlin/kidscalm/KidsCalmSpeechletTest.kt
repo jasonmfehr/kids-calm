@@ -5,6 +5,7 @@ import com.amazon.speech.speechlet.IntentRequest
 import com.amazon.speech.speechlet.Session
 import com.amazon.speech.speechlet.SessionStartedRequest
 import com.amazon.speech.speechlet.User
+import com.amazon.speech.ui.OutputSpeech
 import com.amazon.speech.ui.PlainTextOutputSpeech
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.instanceOf
@@ -20,12 +21,10 @@ class KidsCalmSpeechletTest {
     @Test
     fun testOnLaunchHappyPath() {
         val actual = fixture.onLaunch(null)
-        val actualOutputSpeech = actual.outputSpeech as PlainTextOutputSpeech
-        val actualRepromptSpeech = actual.reprompt.outputSpeech as PlainTextOutputSpeech
 
         assertThat(actual.shouldEndSession, `is`(false))
-        assertThat(actualOutputSpeech.text, `is`("Welcome to Kids Calm."))
-        assertThat(actualRepromptSpeech.text, `is`("Welcome to Kids Calm."))
+        assertSpeech(actual.outputSpeech, "Welcome to Kids Calm beta.")
+        assertSpeech(actual.reprompt.outputSpeech, "you can say things like suggestion, give me an idea, or tell me a game")
     }
 
     @Test
@@ -40,8 +39,11 @@ class KidsCalmSpeechletTest {
         assertThat(session.attributes.get(EXPECTED_ATTRIBUTE_KEY), instanceOf(MutableList::class.java))
 
         for(i in 0..maxResponses*3) {
-            fixture.onIntent(envelope)
+            val actualResponse = fixture.onIntent(envelope)
             val responsesList = session.getAttribute(EXPECTED_ATTRIBUTE_KEY) as MutableList<Int>
+
+            assertThat(actualResponse.shouldEndSession, `is`(false))
+            assertSpeech(actualResponse.reprompt.outputSpeech, "you can say things like suggestion, give me an idea, or tell me a game")
 
             if(i % maxResponses == 0){
                 assertThat(responsesList.size, `is`(1))
@@ -49,6 +51,11 @@ class KidsCalmSpeechletTest {
                 assertThat(responsesList.distinct().size, `is`(responsesList.size))
             }
         }
+    }
+
+    private fun assertSpeech(actualSpeech: OutputSpeech, expectedText: String) {
+        assertThat(actualSpeech, instanceOf(PlainTextOutputSpeech::class.java))
+        assertThat((actualSpeech as PlainTextOutputSpeech).text, `is`(expectedText))
     }
 
 }
