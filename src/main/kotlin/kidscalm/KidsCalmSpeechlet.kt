@@ -61,7 +61,7 @@ class KidsCalmSpeechlet : SpeechletV2 {
 
         providedResponses.add(respIndex)
 
-        return responses.get(respIndex)
+        return responses[respIndex]
     }
 
     private fun buildReprompt(): Reprompt {
