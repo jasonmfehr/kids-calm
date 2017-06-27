@@ -23,7 +23,7 @@ class KidsCalmSpeechletTest {
         val actual = fixture.onLaunch(null)
 
         assertThat(actual.shouldEndSession, `is`(false))
-        assertSpeech(actual.outputSpeech, "Welcome to Kids Calm beta.")
+        assertSpeech(actual.outputSpeech, "Welcome to Quick Calm beta.")
         assertSpeech(actual.reprompt.outputSpeech, "you can say things like suggestion, give me an idea, or tell me a game")
     }
 
