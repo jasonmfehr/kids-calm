@@ -46,7 +46,7 @@ class KidsCalmSpeechlet : SpeechletV2 {
     override fun onLaunch(requestEnvelope: SpeechletRequestEnvelope<LaunchRequest>?): SpeechletResponse {
         LOGGER.info("onLaunch USER_ID=\"${requestEnvelope?.session?.user?.userId}\" SESSION_ID=\"${requestEnvelope?.session?.sessionId}\"")
 
-        return SpeechletResponse.newAskResponse(buildOuptutSpeech("Welcome to Kids Calm beta."), buildReprompt())
+        return SpeechletResponse.newAskResponse(buildOuptutSpeech("Welcome to Quick Calm beta."), buildReprompt())
     }
 
     private fun pickResponse(providedResponses: MutableList<Int>): String {
