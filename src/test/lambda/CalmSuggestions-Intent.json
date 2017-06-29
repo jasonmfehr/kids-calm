@@ -7,7 +7,7 @@
       "userId": "amzn1.ask.account.user1"
     },
     "application": {
-      "applicationId": "amzn1.ask.skill.73c3be5b-911d-41ea-9c62-65854bbdc2b1"
+      "applicationId": "amzn1.ask.skill.44f9a5a7-4d87-4f0e-8a5d-bcd301b14e54"
     }
   },
   "version": "1.0",
@@ -31,7 +31,7 @@
         }
       },
       "application": {
-        "applicationId": "amzn1.ask.skill.73c3be5b-911d-41ea-9c62-65854bbdc2b1"
+        "applicationId": "amzn1.ask.skill.44f9a5a7-4d87-4f0e-8a5d-bcd301b14e54"
       },
       "user": {
         "userId": "amzn1.ask.account.user1"
