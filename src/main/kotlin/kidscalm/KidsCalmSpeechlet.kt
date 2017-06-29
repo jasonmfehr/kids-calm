@@ -13,6 +13,7 @@ class KidsCalmSpeechlet : SpeechletV2 {
     private val LOGGER = LoggerFactory.getLogger("kidscalm.KidsCalmSpeechlet")
 
     private val RESPONSES_SENT_KEY = "responsesSent"
+    private val REPROMPT_TEXT = "you can say things like suggestion, give me an idea, or tell me a game"
 
     internal val responses = listOf(
             "Do ten jumping jacks",
@@ -39,14 +40,14 @@ class KidsCalmSpeechlet : SpeechletV2 {
         val responsesSent = requestEnvelope?.session?.getAttribute(RESPONSES_SENT_KEY) ?: mutableListOf<Int>()
 
         speech.text = this.pickResponse(responsesSent as MutableList<Int>)
-        return SpeechletResponse.newAskResponse(speech, buildReprompt())
 
+        return SpeechletResponse.newTellResponse(speech)
     }
 
     override fun onLaunch(requestEnvelope: SpeechletRequestEnvelope<LaunchRequest>?): SpeechletResponse {
         LOGGER.info("onLaunch USER_ID=\"${requestEnvelope?.session?.user?.userId}\" SESSION_ID=\"${requestEnvelope?.session?.sessionId}\"")
 
-        return SpeechletResponse.newAskResponse(buildOuptutSpeech("Welcome to Quick Calm beta."), buildReprompt())
+        return SpeechletResponse.newAskResponse(buildOuptutSpeech("Welcome to Quick Calm beta where you can get a quick activity when you need a short break.  ${REPROMPT_TEXT}"), buildReprompt())
     }
 
     private fun pickResponse(providedResponses: MutableList<Int>): String {
@@ -67,7 +68,7 @@ class KidsCalmSpeechlet : SpeechletV2 {
     private fun buildReprompt(): Reprompt {
         val reprompt = Reprompt()
 
-        reprompt.outputSpeech = buildOuptutSpeech("you can say things like suggestion, give me an idea, or tell me a game")
+        reprompt.outputSpeech = buildOuptutSpeech(REPROMPT_TEXT)
 
         return reprompt
     }

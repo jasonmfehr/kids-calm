@@ -8,6 +8,7 @@ import com.amazon.speech.speechlet.User
 import com.amazon.speech.ui.OutputSpeech
 import com.amazon.speech.ui.PlainTextOutputSpeech
 import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -16,15 +17,15 @@ class KidsCalmSpeechletTest {
 
     private val fixture = KidsCalmSpeechlet()
     private val EXPECTED_ATTRIBUTE_KEY = "responsesSent"
-
+    private val EXPECTED_REPROMPT_TEXT = "you can say things like suggestion, give me an idea, or tell me a game"
 
     @Test
     fun testOnLaunchHappyPath() {
         val actual = fixture.onLaunch(null)
 
         assertThat(actual.shouldEndSession, `is`(false))
-        assertSpeech(actual.outputSpeech, "Welcome to Quick Calm beta.")
-        assertSpeech(actual.reprompt.outputSpeech, "you can say things like suggestion, give me an idea, or tell me a game")
+        assertSpeech(actual.outputSpeech, "Welcome to Quick Calm beta where you can get a quick activity when you need a short break.  ${EXPECTED_REPROMPT_TEXT}")
+        assertSpeech(actual.reprompt.outputSpeech, EXPECTED_REPROMPT_TEXT)
     }
 
     @Test
@@ -42,8 +43,8 @@ class KidsCalmSpeechletTest {
             val actualResponse = fixture.onIntent(envelope)
             val responsesList = session.getAttribute(EXPECTED_ATTRIBUTE_KEY) as MutableList<Int>
 
-            assertThat(actualResponse.shouldEndSession, `is`(false))
-            assertSpeech(actualResponse.reprompt.outputSpeech, "you can say things like suggestion, give me an idea, or tell me a game")
+            assertThat(actualResponse.shouldEndSession, `is`(true))
+            assertThat(actualResponse.reprompt, nullValue())
 
             if(i % maxResponses == 0){
                 assertThat(responsesList.size, `is`(1))
