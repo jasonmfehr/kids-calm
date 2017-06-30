@@ -2,31 +2,24 @@ package kidscalm
 
 import com.amazon.speech.json.SpeechletRequestEnvelope
 import com.amazon.speech.speechlet.*
-import com.amazon.speech.ui.OutputSpeech
-import com.amazon.speech.ui.PlainTextOutputSpeech
-import com.amazon.speech.ui.Reprompt
 import org.slf4j.LoggerFactory
-import java.util.*
+import quickcalm.REPROMPT_TEXT
+import quickcalm.buildOutputSpeech
+import quickcalm.buildReprompt
+import quickcalm.handlers.QCExit
+import quickcalm.handlers.QCHandler
+import quickcalm.handlers.QCHelp
+import quickcalm.handlers.QCPrimary
+import quickcalm.buildOutputSpeech
 
 class KidsCalmSpeechlet : SpeechletV2 {
 
     private val LOGGER = LoggerFactory.getLogger("kidscalm.KidsCalmSpeechlet")
-
-    private val RESPONSES_SENT_KEY = "responsesSent"
-    private val REPROMPT_TEXT = "you can say things like suggestion, give me an idea, or tell me a game"
-
-    internal val responses = listOf(
-            "Do ten jumping jacks",
-            "Do yoga child's pose",
-            "Do yoga downward dog",
-            "Take 3 slow deep breaths",
-            "Hugs and kisses",
-            "Do a short backrub"
-    )
+    private val HANDLER_LIST = listOf<QCHandler>(QCPrimary(), QCExit(), QCHelp())
 
     override fun onSessionStarted(requestEnvelope: SpeechletRequestEnvelope<SessionStartedRequest>?) {
         LOGGER.info("onSessionStarted USER_ID=\"${requestEnvelope?.session?.user?.userId}\" SESSION_ID=\"${requestEnvelope?.session?.sessionId}\"")
-        requestEnvelope?.session?.attributes?.put(RESPONSES_SENT_KEY, mutableListOf<Int>())
+        //requestEnvelope?.session?.attributes?.put(RESPONSES_SENT_KEY, mutableListOf<Int>())
     }
 
     override fun onSessionEnded(requestEnvelope: SpeechletRequestEnvelope<SessionEndedRequest>?) {
@@ -34,50 +27,26 @@ class KidsCalmSpeechlet : SpeechletV2 {
     }
 
     override fun onIntent(requestEnvelope: SpeechletRequestEnvelope<IntentRequest>?): SpeechletResponse {
-        LOGGER.info("onIntent INTENT_NAME=\"${requestEnvelope?.request?.intent?.name}\" USER_ID=\"${requestEnvelope?.session?.user?.userId}\" SESSION_ID=\"${requestEnvelope?.session?.sessionId}\"")
+        val intentName = requestEnvelope?.request?.intent?.name
+        LOGGER.info("onIntent INTENT_NAME=\"${intentName}\" USER_ID=\"${requestEnvelope?.session?.user?.userId}\" SESSION_ID=\"${requestEnvelope?.session?.sessionId}\"")
 
-        val speech = PlainTextOutputSpeech()
-        val responsesSent = requestEnvelope?.session?.getAttribute(RESPONSES_SENT_KEY) ?: mutableListOf<Int>()
+        if(intentName != null && requestEnvelope != null){
+            for (handler in HANDLER_LIST) {
+                if (handler.handlesIntent(intentName, requestEnvelope)) {
+                    return handler.generate(requestEnvelope)
+                }
+            }
+        }
 
-        speech.text = this.pickResponse(responsesSent as MutableList<Int>)
-
-        return SpeechletResponse.newTellResponse(speech)
+        //this response will be sent if no handler was found that handles the request
+        //or if either requestEnvelope.request.intent.name of requestEnvelope is null
+        return SpeechletResponse.newTellResponse(buildOutputSpeech("error occurred, goodbye"))
     }
 
     override fun onLaunch(requestEnvelope: SpeechletRequestEnvelope<LaunchRequest>?): SpeechletResponse {
         LOGGER.info("onLaunch USER_ID=\"${requestEnvelope?.session?.user?.userId}\" SESSION_ID=\"${requestEnvelope?.session?.sessionId}\"")
 
-        return SpeechletResponse.newAskResponse(buildOuptutSpeech("Welcome to Quick Calm beta where you can get a quick activity when you need a short break.  ${REPROMPT_TEXT}"), buildReprompt())
-    }
-
-    private fun pickResponse(providedResponses: MutableList<Int>): String {
-        if(providedResponses.size == responses.size){
-            providedResponses.clear()
-        }
-
-        var respIndex: Int
-        do {
-            respIndex = Random().nextInt(responses.size)
-        } while(providedResponses.contains(respIndex))
-
-        providedResponses.add(respIndex)
-
-        return responses[respIndex]
-    }
-
-    private fun buildReprompt(): Reprompt {
-        val reprompt = Reprompt()
-
-        reprompt.outputSpeech = buildOuptutSpeech(REPROMPT_TEXT)
-
-        return reprompt
-    }
-
-    private fun buildOuptutSpeech(text: String): OutputSpeech {
-        val speech = PlainTextOutputSpeech()
-        speech.text = text
-
-        return speech
+        return SpeechletResponse.newAskResponse(buildOutputSpeech("Welcome to Quick Calm beta where you can get a quick activity when you need a short break.  ${REPROMPT_TEXT}"), buildReprompt())
     }
 
 }

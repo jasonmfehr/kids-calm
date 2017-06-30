@@ -8,6 +8,10 @@ import com.amazon.speech.ui.Reprompt
 
 class QCHelp: QCHandler {
 
+    override fun handlesIntent(intentName: String, req: SpeechletRequestEnvelope<IntentRequest>): Boolean {
+        return "AMAZON.HelpIntent".equals(intentName)
+    }
+
     override fun generate(req: SpeechletRequestEnvelope<IntentRequest>): SpeechletResponse {
         val speech = PlainTextOutputSpeech()
         val reprompt = Reprompt()

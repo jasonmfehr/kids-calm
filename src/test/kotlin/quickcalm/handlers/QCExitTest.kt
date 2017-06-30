@@ -7,16 +7,30 @@ import org.junit.Assert.assertThat
 
 import org.junit.Test
 import quickcalm.assertSpeech
+import quickcalm.buildRequestEnvelope
 
 class QCExitTest {
 
     @Test
-    fun testHappyPath() {
-        val fixture = QCExit() as QCHandler
-        val actual = fixture.generate(SpeechletRequestEnvelope.builder<IntentRequest>().build())
+    fun testGenerateHappyPath() {
+        val actual = fixture().generate(SpeechletRequestEnvelope.builder<IntentRequest>().build())
 
         assertThat(actual.shouldEndSession, `is`(true))
         assertSpeech(actual.outputSpeech, "goodbye")
+    }
+
+    @Test
+    fun testHandlesStop() {
+        assertThat(fixture().handlesIntent("AMAZON.StopIntent", buildRequestEnvelope()), `is`(true))
+    }
+
+    @Test
+    fun testHandlesCancel() {
+        assertThat(fixture().handlesIntent("AMAZON.CancelIntent", buildRequestEnvelope()), `is`(true))
+    }
+
+    private fun fixture(): QCHandler {
+        return QCExit()
     }
 
 }
